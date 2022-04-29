@@ -6,17 +6,19 @@ from .models import Task
 from .serializers import TaskSerializer
 from rest_framework import serializers
 from rest_framework import status
-
+from datetime import datetime
+from .models import *
 
 @api_view(['GET'])
 def TaskOverview(request):
     api_urls = {
-        'all_items': '/',
+        'All tasks': '/all',
+        'Single task': '/task/pk',
         # 'Search by Category': '/?category=category_name',
         # 'Search by Subcategory': '/?subcategory=category_name',
-        'Add': '/create',
+        'Create': '/create',
         'Update': '/update/pk',
-        'Delete': '/item/pk/delete'
+        'Delete': '/task/delete/pk'
     }
 
     return Response(api_urls)
@@ -43,7 +45,8 @@ def view_tasks(request):
     if request.query_params:
         tasks = Task.objects.filter(**request.query_param.dict())
     else:
-        tasks = Task.objects.all().order_by("status")
+        # tasks = Task.objects.all().order_by("-task_priority")
+        tasks = Task.objects.all().order_by("task_priority")
     if tasks:
         # data = TaskSerializer(tasks)
         return Response(TaskSerializer(tasks, many=True).data)
@@ -68,3 +71,10 @@ def delete_tasks(request, pk):
     task = get_object_or_404(Task, pk=pk)
     task.delete()
     return Response(status=status.HTTP_202_ACCEPTED)
+
+
+@api_view(['GET'])
+def view_task(request, pk):
+    tasks = Task.objects.get(pk=pk)
+    serializer = TaskSerializer(tasks, many=False)
+    return Response(serializer.data)
