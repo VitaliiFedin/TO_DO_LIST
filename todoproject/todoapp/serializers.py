@@ -4,8 +4,10 @@ from django.db.models import fields
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    category=serializers.StringRelatedField()
     class Meta:
         model = Task
         fields = (
             'task_id', 'task_name', 'task_description', 'category', 'task_priority', 'status', 'deadline',
-            'time_create', 'time_update')
+            'time_create', 'time_update','author')
+

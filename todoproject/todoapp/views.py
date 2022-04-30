@@ -7,19 +7,22 @@ from .serializers import TaskSerializer
 from rest_framework import serializers
 from rest_framework import status
 from datetime import datetime
-from .models import *
+from django.views.generic import ListView
+from django.utils import timezone
+
 
 @api_view(['GET'])
 def TaskOverview(request):
     api_urls = {
         'All tasks': '/all',
         'Single task': '/task/pk',
-        # 'Search by Category': '/?category=category_name',
-        # 'Search by Subcategory': '/?subcategory=category_name',
         'Create': '/create',
         'Update': '/update/pk',
-        'Delete': '/task/delete/pk'
+        'Delete': '/task/delete/pk',
+        'Overdue': 'task/overdue/'
     }
+    deadline_check = Task.objects.filter(deadline__lte=timezone.now()).exclude(status='Done').update(status='Overdue')
+
 
     return Response(api_urls)
 
@@ -40,13 +43,15 @@ def add_tasks(request):
 
 @api_view(['GET'])
 def view_tasks(request):
-    # tasks = Task.objects.all()
     # serializer = TaskSerializer(tasks,many=True)
     if request.query_params:
         tasks = Task.objects.filter(**request.query_param.dict())
     else:
         # tasks = Task.objects.all().order_by("-task_priority")
-        tasks = Task.objects.all().order_by("task_priority")
+        tasks = Task.objects.all().order_by("-status", 'task_priority')
+
+        # tasks = Task.objects.all().filter(status='Overdue',task_priority=%d)
+
     if tasks:
         # data = TaskSerializer(tasks)
         return Response(TaskSerializer(tasks, many=True).data)
@@ -54,10 +59,10 @@ def view_tasks(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def update_task(request, pk):
     task = Task.objects.get(pk=pk)
-    data = TaskSerializer(instance=task, data=request.data)
+    data = TaskSerializer(task, data=request.data, partial=True)
 
     if data.is_valid():
         data.save()
@@ -78,3 +83,17 @@ def view_task(request, pk):
     tasks = Task.objects.get(pk=pk)
     serializer = TaskSerializer(tasks, many=False)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def overdue_tasks(request):
+    # serializer = TaskSerializer(tasks,many=True)
+    if request.query_params:
+        tasks = Task.objects.filter(**request.query_param.dict())
+    else:
+        tasks = Task.objects.all().filter(status='Overdue').order_by('task_priority')
+    if tasks:
+        # data = TaskSerializer(tasks)
+        return Response(TaskSerializer(tasks, many=True).data)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
