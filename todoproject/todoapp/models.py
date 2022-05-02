@@ -1,3 +1,5 @@
+
+
 from django.db import models
 from datetime import datetime
 from django.utils import timezone
@@ -26,16 +28,9 @@ class Task(models.Model):
     deadline = models.DateTimeField()
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
-    author = models.CharField(max_length=255,default=User.objects.all())
 
-    # When(time_create = deadline, then='task_priority')
 
-    # def chechdeadline(self):
-    #     Task.objects.filter(self.time_create<self.deadline).update(self.status=='DONE')
 
-    # def checkdeadline(self):
-    #     if self.deadline>=timezone.now():
-    #         self.task_name=='Ploxo'
 
     def __str__(self):
         return self.task_name

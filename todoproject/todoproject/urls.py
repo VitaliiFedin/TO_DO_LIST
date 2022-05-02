@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
-from .yasg import urlpatterns as doc_urls
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +24,3 @@ urlpatterns = [
     path('', RedirectView.as_view(url='api/')),
 
 ]
-urlpatterns+=doc_urls

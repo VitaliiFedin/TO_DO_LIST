@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,9 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'todoapp.apps.TodoappConfig',
-    'drf_yasg',
+    'django_celery_beat',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -124,4 +124,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_BEAT_SCHEDULE = {
+      'add-every-5-seconds': {
+        'task': 'todoproject.celery.debug_task',
+        'schedule': crontab(minute=0, hour=0),
 
+        'options': {
+            'expires': 15.0,
+        },
+    },
+}

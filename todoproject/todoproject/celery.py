@@ -2,15 +2,15 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'todoproject.settings')
 from celery import Celery
+from celery.schedules import crontab
 from todoapp.models import Task
 from django.utils import timezone
+from celery import shared_task
 import django
+
 django.setup()
-
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'todoproject.settings')
-
 app = Celery('todoproject')
 
 # Using a string here means the worker doesn't have to serialize
@@ -22,6 +22,10 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 
+
 @app.task(bind=True)
 def debug_task(self):
     deadline_check = Task.objects.filter(deadline__lte=timezone.now()).exclude(status='Done').update(status='Overdue')
+# @app.task(bind=True)
+# def debug_task(self):
+#     print('Request: {0!r}'.format(self.request))
