@@ -1,41 +1,48 @@
-
 from rest_framework import serializers
 from django import forms
-
-from .models import Task,TaskCategory
+from .models import Task, TaskCategory
 from django.contrib.auth.models import User
-from django.db.models import fields
 
 
+# Creating serializer for User to retrieve user name
+class UserSerializer(serializers.ModelSerializer):
+    task = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'task']
+
+
+# Creating serializer for Task model to retrieve all fields and convert category into charfield
 class TaskSerializerAll(serializers.ModelSerializer):
-
-    class Meta:
-        model = Task
-        deadline = serializers.DateField(format="%Y-%m-%d",input_formats=['%Y-%m-%d',])
-
-        fields = (
-              'task_id', 'task_name',  'category', 'task_priority', 'status', 'deadline',
-              'time_create', 'time_update')
-
-class TaskSerializer(serializers.ModelSerializer):
-    #category = serializers.CharField(source='category.category_name')
-    class Meta:
-        model = Task
-        fields = (
-              'task_id', 'task_name', 'time_create', 'deadline',
-              )
-class SingleTaskSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
     category = serializers.CharField(source='category.category_name')
-    owner = serializers.ReadOnlyField(source='owner.username')
+
+    class Meta:
+        model = Task
+        author = serializers.ReadOnlyField(source='author.username')
+        fields = (
+            'task_id', 'task_name', 'task_description', 'category', 'task_priority', 'status', 'deadline',
+            'time_create', 'time_update', 'author')
+
+
+# Creating serializer for Task model to retrieve specific fields to show all tasks
+class TaskSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Task
+        fields = (
+            'task_id', 'task_name', 'time_create', 'deadline', 'author'
+        )
+
+
+# Creating serializer for Task model to retrieve all fields to update purpose
+class UpdateTaskSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
     class Meta:
         model = Task
         fields = (
             'task_id', 'task_name', 'task_description', 'category', 'task_priority', 'status', 'deadline',
-            'time_create', 'time_update','owner')
-
-class UserSerializer(serializers.ModelSerializer):
-    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Task.objects.all())
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'snippets']
+            'time_create', 'time_update', 'author')

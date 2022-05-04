@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'todoapp.apps.TodoappConfig',
     'django_celery_beat',
     'drf_yasg',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -125,6 +126,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = 'redis://localhost:6379'
+
+# Setting a schedule for celery task: every day midnight
 CELERY_BEAT_SCHEDULE = {
     'add-daily at midnight': {
         'task': 'todoproject.celery.debug_task',
@@ -134,11 +137,4 @@ CELERY_BEAT_SCHEDULE = {
         },
     },
 }
-REST_FRAMEWORK = {
-   'DEFAULT_AUTHENTICATION_CLASSES': (
-       'rest_framework.authentication.TokenAuthentication',
-   ),
-   'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
-   ),
-}
+
