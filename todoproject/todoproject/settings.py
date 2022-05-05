@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,11 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--^pf*hfa8jzrazr72o-7$f+bvseq6%!hnt1gdu5s4rl8v+!%sp'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 ALLOWED_HOSTS = []
 
@@ -41,6 +39,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'drf_yasg',
     'rest_framework.authtoken',
+
 ]
 
 MIDDLEWARE = [
@@ -72,20 +71,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'todoproject.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'To_Do',
-        'USER': 'postgres',
-        'PASSWORD': 'fed123321',
-        'HOST': 'localhost',
-        'PORT': '5432'
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -126,15 +111,24 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_IMPORTS = [
+    'todoapp.task',
+]
 
 # Setting a schedule for celery task: every day midnight
-CELERY_BEAT_SCHEDULE = {
-    'add-daily at midnight': {
-        'task': 'todoproject.celery.debug_task',
-        'schedule': crontab(minute=0, hour=0),
-        'options': {
-            'expires': 15.0,
-        },
-    },
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'add-daily at midnight': {
+#         'task': 'todoproject.celery.debug_task',
+#         'schedule': crontab(minute=0, hour=0),
+#         'options': {
+#             'expires': 15.0,
+#         },
+#     },
+# }
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+
 

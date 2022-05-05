@@ -1,7 +1,7 @@
-from rest_framework import serializers
-from django import forms
-from .models import Task, TaskCategory
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from .models import Task
 
 
 # Creating serializer for User to retrieve user name
@@ -16,14 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
 # Creating serializer for Task model to retrieve all fields and convert category into charfield
 class TaskSerializerAll(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
-    category = serializers.CharField(source='category.category_name')
+    category = serializers.CharField(source='category.name')
 
     class Meta:
         model = Task
-        author = serializers.ReadOnlyField(source='author.username')
-        fields = (
-            'task_id', 'task_name', 'task_description', 'category', 'task_priority', 'status', 'deadline',
-            'time_create', 'time_update', 'author')
+        fields = '__all__'
 
 
 # Creating serializer for Task model to retrieve specific fields to show all tasks
@@ -33,7 +30,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = (
-            'task_id', 'task_name', 'time_create', 'deadline', 'author'
+            'id', 'name', 'time_create', 'deadline', 'author'
         )
 
 
@@ -43,6 +40,4 @@ class UpdateTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = (
-            'task_id', 'task_name', 'task_description', 'category', 'task_priority', 'status', 'deadline',
-            'time_create', 'time_update', 'author')
+        fields = '__all__'
