@@ -1,21 +1,12 @@
 from celery.schedules import crontab
-
+# Creating a schedule to perform a celery task.
 beat_schedule = {
     'add-daily at midnight': {
         'task': 'todoapp.task.debug_task',
-        'schedule': crontab(),
+        'schedule': crontab(minute=0, hour=0),
         'options': {
             'expires': 15.0,
         },
     },
 }
 
-# CELERY_BEAT_SCHEDULE = {
-#     'add-daily at midnight': {
-#         'task': 'todoproject.celery.debug_task',
-#         'schedule': crontab(),
-#         'options': {
-#             'expires': 15.0,
-#         },
-#     },
-# }

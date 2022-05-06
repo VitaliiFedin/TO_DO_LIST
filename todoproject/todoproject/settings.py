@@ -115,17 +115,6 @@ CELERY_IMPORTS = [
     'todoapp.task',
 ]
 
-# Setting a schedule for celery task: every day midnight
-# CELERY_BEAT_SCHEDULE = {
-#     'add-daily at midnight': {
-#         'task': 'todoproject.celery.debug_task',
-#         'schedule': crontab(minute=0, hour=0),
-#         'options': {
-#             'expires': 15.0,
-#         },
-#     },
-# }
-
 try:
     from .local_settings import *
 except ImportError:

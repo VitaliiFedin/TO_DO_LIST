@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/', include('todoapp.urls')),
     path('', RedirectView.as_view(url='swagger/')),
 ]
+# Adding yasg urlpatterns to exists
 urlpatterns += yasg_patterns
